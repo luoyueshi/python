@@ -39,6 +39,10 @@ def readcsv():
 if __name__ == "__main__":
     import sys
     readcsv()
+    
+    
+#    git config --global credential.helper store
+    
     sys.exit(1)
     
     shformat = "http://quotes.money.163.com/service/chddata.html?code=0%s&start=19020918&end=22151212&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP"  
