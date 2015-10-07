@@ -1,0 +1,10 @@
+1 ulipad 使用中文
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")  
+测试
+a='\xd5\xd0\xc9\xcc\xd2\xf8\xd0\xd0'
+print a.decode('gbk')
+
+2
+

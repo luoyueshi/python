@@ -1,0 +1,108 @@
+1 常用术语参考资料 http://blog.sina.com.cn/s/blog_55a295dd010002xb.html
+2 历史表
+日期,股票代码,名称,收盘价,最高价,最低价,开盘价,前收盘,涨跌额,涨跌幅,换手率,成交量,成交金额,总市值,流通市值
+
+drop database stock;
+create database stock CHARACTER SET utf8;
+use stock;
+    
+drop table stock_history;
+create table stock_history
+(
+    day datetime not null COMMENT '日期',
+    code int8 not null COMMENT '股票代码' ,
+    name char(30) not null COMMENT '名称' ,
+    close_price DECIMAL(20,2) not null COMMENT '收盘价' ,
+    high_price DECIMAL(20,2) not null COMMENT ',最高价,' ,
+    low_price DECIMAL(20,2) not null COMMENT '最低价',
+    open_price DECIMAL(20,2) not null COMMENT '开盘价' ,
+    before_closing_price DECIMAL(20,2) not null COMMENT '前收盘' ,
+    s_change DECIMAL(20,4) not null COMMENT '涨跌额',
+    chg DECIMAL(25,4) not null COMMENT '涨跌幅',
+    turnover_rate DECIMAL(20,4) not null COMMENT '换手率',
+    volume DECIMAL(20,5) not null COMMENT '成交量',
+    AMO DECIMAL(50,5) not null COMMENT '成交金额',
+    market_cap  DECIMAL(50,5) not null COMMENT '总市值',
+    circulation_market_value DECIMAL(50,5) not null COMMENT '流通市值',
+
+    primary key(code, close_price, high_price, low_price, open_price)
+)engine=innod default charset=utf8 auto_increment=1;
+
+3 常用sql
+按年查询每年最高价，最低价，最高收盘价，平均收盘价
+select year(day) as year, max(high_price), MIN(low_price), max(close_price), min(close_price),  sum(close_price)/ count(*)
+from stock_history 
+where code = 600557 
+group by year(day);
+
+按年查询每年 月最高价，最低价，最高收盘价，平均收盘价
+select year(day) as year, month(day), max(high_price), MIN(low_price), 
+max(close_price), min(close_price),  sum(close_price)/ count(*)
+from stock_history 
+where code = 600557 
+group by year(day), month(day);
+
+按年查询每年 周最高价，最低价，最高收盘价，平均收盘价
+select year(day) as year, week(day), max(high_price), MIN(low_price), 
+max(close_price), min(close_price),  sum(close_price)/ count(*)
+from stock_history 
+where code = 600557 
+group by year(day), week(day);
+
+查询公司每年资产对比
+select a.year, a.avg, b.year, b.avg, (a.avg - b.avg) * 100/b.avg as growth_rate  from 
+(
+select year(day) as year, max(market_cap) as max, MIN(market_cap) as min,  sum(market_cap)/ count(*) as avg
+from stock_history 
+where code = 600036 
+group by year(day)) a
+left join 
+(
+select year(day) as year, max(market_cap) as max, MIN(market_cap) as min,  sum(market_cap)/ count(*) as avg
+from stock_history 
+where code = 600036 
+group by year(day)
+) b
+on a.year = b.year + 1;
+
+公司平均上市后每年的成长率
+select a.*  
+from 
+（select year(day) as year, max(market_cap) as max, MIN(market_cap) as min,  sum(market_cap)/ count(*)) as avg
+from stock_history 
+where code = 600557 
+group by year(day)) a
+where year in (min(year), max(year));
+
+# 有问题
+select a.*  
+from 
+（select year(day) as year, max(market_cap) as max, MIN(market_cap) as min,  sum(market_cap)/ count(*) as avg
+from stock_history 
+where code = 600557 
+group by year(day)) a
+
+select (13938296241.688571428 - 1373827500.000000000 ) / (14 * 1373827500 ) from stock_history limit 1;
+
+# 涨跌天数
+select sum(case  when s_change > 0 then 1 else 0 end) as up,  
+sum(case  when s_change < 0 then 1 end ) as down, 
+sum(case  when s_change = 0 then 1 end ) as at, 
+count(*) 
+from stock_history 
+where code = 600557; 
+
+# 涨跌天数
+select sum(case  when s_change > 0 then 1 else 0 end) as up,  
+sum(case  when s_change < 0 then 1 end ) as down, 
+sum(case  when s_change = 0 then 1 end ) as at, 
+count(*) 
+from stock_history 
+where code = 600557; 
+
+
+
+
+
+
+ 
